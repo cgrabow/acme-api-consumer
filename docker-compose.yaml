@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   acme-api-consumer:
-    build: .
+    build: acme-api-consumer
     container_name: "docker-app"
     ports:
       - 8080:8080
