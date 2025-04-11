@@ -2,7 +2,6 @@ package com.acme.login;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
@@ -10,28 +9,32 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Service
 public class LoginService {
+    public final LoginRepository loginRepository;
+    private final RestTemplate loginApi;
+    public static final String USERNAME = "assignment-test@ubsend.com";
+    public static final String PASSWORD = "p0DrmE)E+BQH$]KasMSb";
 
     @Autowired
-    public LoginRepository loginRepository;
-    @Autowired
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    @Value("${login.api.url}")
-    private String baseUrl;
-
-    public LoginResponse getLogin(@RequestBody LoginRequest loginRequest) {
-        return restTemplate.postForObject(baseUrl, loginRequest, LoginResponse.class);
+    public LoginService(LoginRepository loginRepository, RestTemplate loginApi) {
+        this.loginRepository = loginRepository;
+        this.loginApi = loginApi;
     }
 
-    public void saveLogin() {
+    public LoginResponse getLogin(@RequestBody LoginRequest loginRequest) {
+        return loginApi.postForObject("/login", loginRequest, LoginResponse.class);
+    }
+
+    public String saveLogin() {
         try {
             var response = getLogin(LoginRequest.builder()
-                    .username("assignment-test@ubsend.com")
-                    .password("p0DrmE)E+BQH$]KasMSb")
+                    .username(USERNAME)
+                    .password(PASSWORD)
                     .build());
             loginRepository.save(response);
+            return response.getAccessToken();
         } catch (Exception e) {
             log.error("Error while saving login response: {}", e.getMessage());
+            return "Error";
         }
     }
 }
