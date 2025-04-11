@@ -1,7 +1,6 @@
 package com.acme;
 
 import com.acme.getparcelshops.ParcelShopService;
-import com.acme.login.LoginRepository;
 import com.acme.login.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -16,8 +15,6 @@ public class AcmeApiConsumerApplication {
 	public LoginService loginService;
 	@Autowired
 	public ParcelShopService parcelShopService;
-	@Autowired
-	public LoginRepository loginRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AcmeApiConsumerApplication.class, args);
@@ -26,11 +23,8 @@ public class AcmeApiConsumerApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner() {
 		return args -> {
-			// Call the login service to perform login
-			loginService.saveLogin();
-			var token = loginRepository.findByUsername("assignment-test@ubsend.com").getAccessToken();
+			String token = loginService.saveLogin();
 			parcelShopService.saveParcelShops(token);
 		};
 	}
-
 }
